@@ -1,3 +1,5 @@
+# PROJECT SAMPLE
+
 # MSTeam Chatbot
 
 AI-powered Microsoft Teams chatbot using Selenium automation, Express API, PostgreSQL memory storage, and OpenRouter/OpenAI models.
@@ -5,6 +7,26 @@ AI-powered Microsoft Teams chatbot using Selenium automation, Express API, Postg
 ---
 
 ## GIỚI THIỆU
+
+MSTeam Chatbot là một hệ thống chatbot AI tự động dành cho Microsoft Teams. Hệ thống sử dụng Selenium để tự động đọc tin nhắn từ giao diện Teams Web, gửi nội dung tới AI model thông qua OpenRouter/OpenAI API và phản hồi trực tiếp trong cuộc trò chuyện.
+
+### Các chức năng chính
+
+* Tự động đọc tin nhắn mới từ Microsoft Teams
+* Tự động phản hồi bằng AI
+* Lưu lịch sử hội thoại vào PostgreSQL
+* Quản lý memory theo user
+* Tích hợp OpenRouter/OpenAI model
+* Chạy automation bằng Selenium
+* Hỗ trợ chatbot realtime
+
+### Ảnh minh họa
+
+> [THÊM ẢNH: Giao diện Microsoft Teams khi chatbot trả lời]
+>
+> [THÊM ẢNH: Console backend đang chạy]
+>
+> [THÊM ẢNH: PostgreSQL lưu lịch sử chat]
 
 MSTeam Chatbot là một hệ thống chatbot tự động dành cho Microsoft Teams.
 
@@ -42,7 +64,7 @@ Hệ thống có khả năng:
 
 ---
 
-# MÔI TRƯỜNG HOẠT ĐỘNG
+## MÔI TRƯỜNG HOẠT ĐỘNG
 
 ## Thành phần hệ thống
 
@@ -64,6 +86,57 @@ Hệ thống bao gồm:
 | Browser     | Google Chrome |
 
 ---
+
+* Microsoft Teams Web được sử dụng làm nền tảng chat chính.
+* Selenium WebDriver chạy trên máy local để đọc và gửi tin nhắn.
+* Express API chịu trách nhiệm xử lý logic chatbot.
+* PostgreSQL dùng để lưu lịch sử hội thoại và memory.
+* OpenRouter/OpenAI API dùng để sinh phản hồi AI.
+
+### Sơ đồ tích hợp hệ thống
+
+```mermaid
+flowchart LR
+    User[Microsoft Teams User]
+    Teams[Microsoft Teams Web]
+    Selenium[Selenium Bot]
+    API[Express API Server]
+    AI[OpenRouter / OpenAI]
+    DB[(PostgreSQL)]
+
+    User --> Teams
+    Teams --> Selenium
+    Selenium --> API
+    API --> AI
+    API --> DB
+    AI --> API
+    API --> Selenium
+    Selenium --> Teams
+```
+
+### Luồng xử lý message
+
+```mermaid
+sequenceDiagram
+    autonumber
+
+    actor User
+    participant Teams
+    participant SeleniumBot
+    participant ExpressAPI
+    participant PostgreSQL
+    participant OpenRouter
+
+    User->>Teams: Gửi tin nhắn
+    SeleniumBot->>Teams: Đọc tin nhắn mới
+    SeleniumBot->>ExpressAPI: Gửi message tới API
+    ExpressAPI->>PostgreSQL: Lấy lịch sử hội thoại
+    ExpressAPI->>OpenRouter: Gửi prompt AI
+    OpenRouter-->>ExpressAPI: Sinh phản hồi
+    ExpressAPI->>PostgreSQL: Lưu memory
+    ExpressAPI-->>SeleniumBot: Trả response
+    SeleniumBot->>Teams: Tự động reply
+```
 
 # KIẾN TRÚC HỆ THỐNG
 
@@ -114,7 +187,7 @@ sequenceDiagram
 
 ---
 
-# HƯỚNG DẪN CÀI ĐẶT
+## HƯỚNG DẪN CÀI ĐẶT
 
 ## 1. Clone project
 
@@ -180,7 +253,7 @@ Sau khi browser mở:
 
 ---
 
-# SELF TEST
+### Self Test
 
 ## Tình huống kiểm thử
 
@@ -206,6 +279,10 @@ Chào bạn 😄
 ```
 
 ---
+
+## NGUYÊN LÝ CƠ BẢN
+
+### TÍCH HỢP HỆ THỐNG
 
 # CẤU TRÚC THƯ MỤC
 
@@ -293,7 +370,54 @@ Database dùng để:
 
 ---
 
-# CÁC THUẬT TOÁN CƠ BẢN
+### CÁC THUẬT TOÁN CƠ BẢN
+
+#### 1. Conversation Memory
+
+Hệ thống lưu lịch sử hội thoại theo từng user để duy trì context khi chat.
+
+```mermaid
+flowchart TD
+    A[User gửi message] --> B[Load lịch sử hội thoại]
+    B --> C[Tạo AI prompt]
+    C --> D[Gửi tới OpenRouter]
+    D --> E[Nhận phản hồi AI]
+    E --> F[Lưu vào PostgreSQL]
+```
+
+#### 2. Duplicate Message Detection
+
+Bot sử dụng biến `lastMessage` để tránh tự trả lời lại cùng một nội dung.
+
+```mermaid
+flowchart LR
+    A[Nhận message mới] --> B{Có trùng lastMessage?}
+    B -->|Yes| C[Bỏ qua]
+    B -->|No| D[Xử lý message]
+```
+
+#### 3. Selenium Auto Reply
+
+```mermaid
+sequenceDiagram
+    participant Selenium
+    participant Teams
+
+    Selenium->>Teams: Tìm textbox chat
+    Selenium->>Teams: Nhập response
+    Selenium->>Teams: Send message
+```
+
+#### 4. AI Response Filtering
+
+Hệ thống lọc các message null và emoji Unicode không tương thích Selenium.
+
+```mermaid
+flowchart TD
+    A[AI Response] --> B[Filter null message]
+    B --> C[Remove emoji unicode]
+    C --> D[Safe response]
+```
 
 ## 1. Conversation Memory
 
@@ -349,7 +473,36 @@ const safeHistory = history.filter(
 
 ---
 
-# THIẾT KẾ CƠ SỞ DỮ LIỆU
+### THIẾT KẾ CƠ SỞ DỮ LIỆU
+
+#### ERD Database
+
+```mermaid
+erDiagram
+    USER ||--o{ MESSAGE : sends
+
+    USER {
+        string id
+        string username
+    }
+
+    MESSAGE {
+        string id
+        string userId
+        string role
+        string content
+        datetime createdAt
+    }
+```
+
+#### Mô hình lưu hội thoại
+
+```mermaid
+flowchart LR
+    UserMessage --> PostgreSQL
+    AIResponse --> PostgreSQL
+    PostgreSQL --> MemoryContext
+```
 
 ## ERD
 
@@ -400,6 +553,12 @@ Lưu lịch sử hội thoại.
 
 ---
 
+### CÁC PAYLOAD
+
+> [THÊM ẢNH: Swagger hoặc Postman request chat API]
+>
+> [THÊM ẢNH: JSON response từ chatbot]
+
 # API PAYLOAD
 
 ## Chat Request
@@ -424,6 +583,12 @@ POST /chat
 ```
 
 ---
+
+### ĐẶC TẢ HÀM
+
+> [THÊM ẢNH: Source code hàm getAIResponse()]
+>
+> [THÊM ẢNH: Source code xử lý Selenium message]
 
 # ĐẶC TẢ HÀM
 
@@ -465,6 +630,8 @@ function cleanText(text: string)
 ```
 
 ---
+
+### PHÁT SINH
 
 # XỬ LÝ LỖI
 
@@ -542,9 +709,31 @@ Remove emoji bằng regex.
 
 ---
 
-# KẾT QUẢ
+## KẾT QUẢ
 
-## Chức năng đã hoàn thành
+### Các chức năng đã hoàn thành
+
+* AI chatbot hoạt động trên Microsoft Teams
+* Selenium automation hoạt động ổn định
+* PostgreSQL memory storage
+* OpenRouter integration
+* TypeScript backend
+* Conversation memory
+* AI auto-reply
+
+### Ảnh kết quả
+
+> [THÊM ẢNH: Chatbot phản hồi trong Teams]
+>
+> [THÊM ẢNH: API server hoạt động]
+>
+> [THÊM ẢNH: Database PostgreSQL]
+>
+> [THÊM ẢNH: Terminal Selenium bot]
+
+### Video demo
+
+> [THÊM LINK VIDEO DEMO TẠI ĐÂY]
 
 * AI chatbot hoạt động trên Microsoft Teams
 * Selenium automation hoạt động ổn định
