@@ -1,0 +1,26 @@
+{
+  "name": "chatbot-gr1",
+  "version": "1.0.0",
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
+    "bot": "ts-node-dev --respawn --transpile-only scripts/teamsBot.ts",
+    "build": "tsc",
+    "start": "node dist/index.js"
+  },
+  "dependencies": {
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "node-fetch": "^3.3.2",
+    "pg": "^8.20.0",
+    "selenium-webdriver": "^4.33.0"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.6",
+    "@types/node": "^20.11.30",
+    "@types/pg": "^8.10.9",
+    "@types/selenium-webdriver": "^4.1.22",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.4.5"
+  }
+}
