@@ -25,7 +25,7 @@ MSTeam Chatbot là một hệ thống chatbot AI tự động dành cho Microsof
 > [THÊM ẢNH: Giao diện Microsoft Teams khi chatbot trả lời]
 >
 > [THÊM ẢNH: Console backend đang chạy]
-![alt text](image-1.png)
+![Teams Demo](assets/aa.png)
 >
 > [THÊM ẢNH: PostgreSQL lưu lịch sử chat]
 
