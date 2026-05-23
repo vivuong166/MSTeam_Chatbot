@@ -631,8 +631,7 @@ Remove emoji bằng regex:
 ![API Server hoạt động](assets/api-test.png)
 
 ### Video demo
-
-> [THÊM LINK VIDEO DEMO TẠI ĐÂY]
+![Sẽ demo trực tiếp với thầy]
 
 ---
 
