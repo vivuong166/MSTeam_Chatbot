@@ -1,8 +1,7 @@
 import { Builder, By, Key } from "selenium-webdriver";
 import dotenv from "dotenv";
 dotenv.config();
-import { getAIResponse } from "../src/services/openai";
-
+import { getAIResponse } from "../src/services/openAI";
 
 let lastMessage: string | null = null;
 
@@ -22,7 +21,7 @@ async function startBot() {
     while (true) {
       try {
         const messages = await driver.findElements(
-          By.css('div[data-tid="chat-pane-message"]') // 👉 giữ nguyên cái đang chạy OK
+          By.css('div[data-tid="chat-pane-message"]')
         );
 
         if (messages.length === 0) {
@@ -31,23 +30,27 @@ async function startBot() {
         }
 
         let text: string | null = null;
+        let senderId: string | null = null;
 
-        // 🔥 giữ nguyên logic của bạn (ổn định nhất rồi)
         for (let i = messages.length - 1; i >= 0; i--) {
           const msg = messages[i];
-
           const className = await msg.getAttribute("class");
 
           // ❗ bỏ tin của mình
           if (className.includes("ChatMyMessage")) continue;
 
-          const content = await msg.findElement(
-            By.css("[data-message-content]")
-          );
-
+          const content = await msg.findElement(By.css("[data-message-content]"));
           const t = (await content.getText()).trim();
-
           if (!t) continue;
+
+          // ✅ lấy data-mid → tìm author-{mid} trên toàn trang
+          const mid = await msg.getAttribute("data-mid");
+          try {
+            const authorEl = await driver.findElement(By.id(`author-${mid}`));
+            senderId = (await authorEl.getText()).trim() || "unknown_user";
+          } catch {
+            senderId = "unknown_user";
+          }
 
           text = t;
           break;
@@ -59,8 +62,6 @@ async function startBot() {
           continue;
         }
 
-        console.log("📩 Người khác:", text);
-
         // ❗ tránh duplicate
         if (text === lastMessage) {
           await driver.sleep(2000);
@@ -69,19 +70,10 @@ async function startBot() {
 
         lastMessage = text;
 
-        
-
-        // 🔥 dùng service chung (quan trọng)
-        const senderElement = await driver.findElement(   //message cũng ok
-          By.css('[data-tid="message-author-name"]')
-        );
-
-        const senderName = await senderElement.getText();
-
-        console.log("👤 Sender:", senderName);
+        console.log("👤 Sender ID:", senderId);
         console.log("📩 Message:", text);
 
-        const reply = await getAIResponse(senderName, text);
+        const reply = await getAIResponse(senderId ?? "unknown_user", text);
 
         const inputBox = await driver.findElement(
           By.css('[contenteditable="true"]')

@@ -1,12 +1,17 @@
-import { getAIResponse } from "../services/openai";
+// src/bot/handler.ts
+import { getAIResponse } from "../services/openAI";
 
 export async function handleChat(req: any, res: any) {
-  const userMessage = req.body.message;
+  const { message, userId } = req.body; // ← thêm userId
 
-  if (!userMessage) {
+  if (!message) {
     return res.status(400).json({ error: "Missing message" });
   }
 
-const reply = await getAIResponse("default_user", userMessage);
+  if (!userId) {
+    return res.status(400).json({ error: "Missing userId" });
+  }
+
+  const reply = await getAIResponse(userId, message); // ← không hardcode nữa
   res.json({ reply });
 }
