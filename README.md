@@ -22,12 +22,11 @@ MSTeam Chatbot là một hệ thống chatbot AI tự động dành cho Microsof
 
 ### Ảnh minh họa
 
-> [THÊM ẢNH: Giao diện Microsoft Teams khi chatbot trả lời]
->
-> [THÊM ẢNH: Console backend đang chạy]
+![Giao diện Microsoft Teams khi chatbot trả lời](assets/teams-chat.png)
 
->
-> [THÊM ẢNH: PostgreSQL lưu lịch sử chat]
+![Console backend đang chạy](assets/console-bot.png)
+
+![PostgreSQL lưu lịch sử chat](assets/database.png)
 
 ### Công nghệ sử dụng
 
@@ -234,6 +233,12 @@ Chào bạn 😄
 ```txt
 MSTeam_Chatbot/
 │
+├── assets/
+│   ├── teams-chat.png
+│   ├── console-bot.png
+│   ├── database.png
+│   └── api-test.png
+│
 ├── rag/
 │   ├── data.json
 │   ├── ingest.ts
@@ -307,6 +312,10 @@ Express server chịu trách nhiệm:
 app.post("/chat", handleChat);
 ```
 
+### Ảnh minh họa API
+
+![API Test với Postman](assets/api-test.png)
+
 ---
 
 ## PostgreSQL
@@ -316,6 +325,10 @@ Database dùng để:
 * Lưu lịch sử chat theo từng `user_id`
 * Duy trì context hội thoại riêng biệt cho mỗi người
 * Truy vấn lịch sử khi AI cần context
+
+### Ảnh minh họa Database
+
+![PostgreSQL lưu lịch sử chat theo user](assets/database.png)
 
 ---
 
@@ -397,13 +410,13 @@ erDiagram
 
 Lưu lịch sử hội thoại của tất cả người dùng.
 
-| Field      | Ý nghĩa                    |
-| ---------- | -------------------------- |
-| id         | ID tự tăng (Primary Key)   |
-| user_id    | Tên người dùng từ Teams    |
-| role       | `user` hoặc `assistant`    |
-| content    | Nội dung tin nhắn          |
-| created_at | Thời gian gửi              |
+| Field      | Ý nghĩa                  |
+| ---------- | ------------------------ |
+| id         | ID tự tăng (Primary Key) |
+| user_id    | Tên người dùng từ Teams  |
+| role       | `user` hoặc `assistant`  |
+| content    | Nội dung tin nhắn        |
+| created_at | Thời gian gửi            |
 
 ---
 
@@ -415,8 +428,8 @@ Lưu lịch sử hội thoại của tất cả người dùng.
 POST /chat
 
 {
-  "userId": "Nguyen Van A",
-  "message": "Hello"
+  "userId": "Nguyen Chi Tam 20233630",
+  "message": "Xin chào"
 }
 ```
 
@@ -426,9 +439,13 @@ POST /chat
 
 ```json
 {
-  "reply": "Xin chào 😄"
+  "reply": "Xin chào! Bạn cần giúp gì hôm nay?"
 }
 ```
+
+### Ảnh minh họa
+
+![API Test Postman](assets/api-test.png)
 
 ---
 
@@ -605,13 +622,13 @@ Remove emoji bằng regex:
 
 ### Ảnh kết quả
 
-> [THÊM ẢNH: Chatbot phản hồi trong Teams]
->
-> [THÊM ẢNH: API server hoạt động]
->
-> [THÊM ẢNH: Database PostgreSQL]
->
-> [THÊM ẢNH: Terminal Selenium bot]
+![Chatbot phản hồi trong Teams](assets/teams-chat.png)
+
+![Terminal Selenium bot](assets/console-bot.png)
+
+![Database PostgreSQL](assets/database.png)
+
+![API Server hoạt động](assets/api-test.png)
 
 ### Video demo
 
