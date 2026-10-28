@@ -2,13 +2,13 @@
 
 # MSTeam Chatbot
 
-AI-powered Microsoft Teams chatbot using Selenium automation, Express API, PostgreSQL memory storage, and OpenRouter/OpenAI models.
+AI-powered Microsoft Teams chatbot using Selenium automation, Express API, PostgreSQL memory storage, and the Gemini API.
 
 ---
 
 ## GIỚI THIỆU
 
-MSTeam Chatbot là một hệ thống chatbot AI tự động dành cho Microsoft Teams. Hệ thống sử dụng Selenium để tự động đọc tin nhắn từ giao diện Teams Web, gửi nội dung tới AI model thông qua OpenRouter/OpenAI API và phản hồi trực tiếp trong cuộc trò chuyện.
+MSTeam Chatbot là một hệ thống chatbot AI tự động dành cho Microsoft Teams. Hệ thống sử dụng Selenium để tự động đọc tin nhắn từ giao diện Teams Web, gửi nội dung tới Gemini API và phản hồi trực tiếp trong cuộc trò chuyện.
 
 ### Các chức năng chính
 
@@ -16,7 +16,7 @@ MSTeam Chatbot là một hệ thống chatbot AI tự động dành cho Microsof
 * Tự động phản hồi bằng AI
 * Lưu lịch sử hội thoại vào PostgreSQL theo từng user
 * Quản lý memory riêng biệt theo user_id
-* Tích hợp OpenRouter/OpenAI model
+* Tích hợp Gemini model
 * Chạy automation bằng Selenium
 * Hỗ trợ chatbot realtime
 
@@ -37,8 +37,8 @@ MSTeam Chatbot là một hệ thống chatbot AI tự động dành cho Microsof
 | Back-end API            | Express.js           |
 | Runtime                 | Node.js + TypeScript |
 | Database                | PostgreSQL           |
-| AI Provider             | OpenRouter API       |
-| AI Model                | GPT-4o-mini          |
+| AI Provider             | Gemini API           |
+| AI Model                | Gemini 3.5 Flash (cấu hình được) |
 | Environment Management  | dotenv               |
 
 ---
@@ -60,7 +60,7 @@ Hệ thống bao gồm:
 * Microsoft Teams Web
 * Selenium Bot
 * Express API Server
-* OpenRouter AI Service
+* Gemini AI Service
 * PostgreSQL Database
 
 ### Nền tảng vận hành
@@ -76,7 +76,7 @@ Hệ thống bao gồm:
 * Selenium WebDriver chạy trên máy local để đọc và gửi tin nhắn.
 * Express API chịu trách nhiệm xử lý logic chatbot.
 * PostgreSQL dùng để lưu lịch sử hội thoại và memory.
-* OpenRouter/OpenAI API dùng để sinh phản hồi AI.
+* Gemini API dùng để sinh phản hồi AI.
 
 ### Sơ đồ tích hợp hệ thống
 
@@ -86,7 +86,7 @@ flowchart LR
     Teams[Microsoft Teams Web]
     Selenium[Selenium Bot]
     API[Express API Server]
-    AI[OpenRouter / OpenAI]
+    AI[Gemini API]
     DB[(PostgreSQL)]
 
     User --> Teams
@@ -110,14 +110,14 @@ sequenceDiagram
     participant SeleniumBot
     participant ExpressAPI
     participant PostgreSQL
-    participant OpenRouter
+    participant Gemini
 
     User->>Teams: Gửi tin nhắn
     SeleniumBot->>Teams: Đọc tin nhắn mới
     SeleniumBot->>ExpressAPI: Gửi message tới API
     ExpressAPI->>PostgreSQL: Lấy lịch sử hội thoại
-    ExpressAPI->>OpenRouter: Gửi prompt AI
-    OpenRouter-->>ExpressAPI: Sinh phản hồi
+    ExpressAPI->>Gemini: Gửi prompt AI
+    Gemini-->>ExpressAPI: Sinh phản hồi
     ExpressAPI->>PostgreSQL: Lưu memory
     ExpressAPI-->>SeleniumBot: Trả response
     SeleniumBot->>Teams: Tự động reply
@@ -167,8 +167,10 @@ CREATE TABLE messages (
 ## 4. Tạo file `.env`
 
 ```env
-OPENROUTER_API_KEY=your_api_key
 DB_PASSWORD=your_password
+GEMINI_API_KEY=your_gemini_api_key
+GEMINI_MODEL=gemini-3.5-flash
+GEMINI_EMBEDDING_MODEL=gemini-embedding-001
 ```
 
 ---
@@ -259,7 +261,7 @@ MSTeam_Chatbot/
 │   │   └── dbMemory.ts
 │   │
 │   ├── services/
-│   │   └── openai.ts
+│   │   └── gemini.ts
 │   │
 │   ├── utils/
 │   │   └── logger.ts
@@ -342,7 +344,7 @@ Hệ thống lưu lịch sử hội thoại theo từng user để duy trì cont
 flowchart TD
     A[User gửi message] --> B[Load lịch sử hội thoại theo user_id]
     B --> C[Tạo AI prompt]
-    C --> D[Gửi tới OpenRouter]
+    C --> D[Gửi tới Gemini]
     D --> E[Nhận phản hồi AI]
     E --> F[Lưu vào PostgreSQL]
 ```
@@ -455,7 +457,7 @@ POST /chat
 
 ### Chức năng
 
-Lấy lịch sử hội thoại của user, gửi prompt tới OpenRouter AI và nhận phản hồi.
+Lấy lịch sử hội thoại của user, gửi prompt tới Gemini API và nhận phản hồi.
 
 ### Prototype
 
@@ -510,7 +512,7 @@ addMessage(userId: string, role: "user" | "assistant", content: string): Promise
 
 # XỬ LÝ LỖI
 
-## Lỗi OpenAI/OpenRouter API
+## Lỗi Gemini API
 
 ### Nguyên nhân
 
@@ -615,7 +617,7 @@ Remove emoji bằng regex:
 * AI chatbot hoạt động trên Microsoft Teams
 * Selenium automation hoạt động ổn định
 * PostgreSQL memory storage theo từng user
-* OpenRouter integration
+* Gemini API integration
 * TypeScript backend
 * Conversation memory
 * AI auto-reply

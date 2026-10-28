@@ -1,46 +1,64 @@
-import fetch from "node-fetch";
+import dotenv from "dotenv";
 import fs from "fs";
+import path from "path";
 
-const docs: string[] = JSON.parse(
-  fs.readFileSync("./src/rag/data.json", "utf-8")
-);
+dotenv.config();
 
-async function embed(text: string): Promise<number[]> {
-  const res = await fetch("https://openrouter.ai/api/v1/embeddings", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      model: "text-embedding-3-small",
-      input: text
-    })
-  });
+const dataPath = path.resolve(process.cwd(), "rag", "data.json");
+const rawDocs = fs.readFileSync(dataPath, "utf-8").trim();
+const docs: string[] = rawDocs ? JSON.parse(rawDocs) : [];
 
-  const data = await res.json();
-  return data.data[0].embedding;
+type EmbeddingResponse = {
+  embedding?: { values?: number[] };
+  error?: { message?: string };
+};
+
+async function embed(
+  text: string,
+  taskType: "RETRIEVAL_QUERY" | "RETRIEVAL_DOCUMENT"
+): Promise<number[]> {
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) throw new Error("GEMINI_API_KEY is not configured");
+
+  const model = process.env.GEMINI_EMBEDDING_MODEL || "gemini-embedding-001";
+  const res = await fetch(
+    `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:embedContent`,
+    {
+      method: "POST",
+      headers: { "x-goog-api-key": apiKey, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        taskType,
+        content: { parts: [{ text }] }
+      })
+    }
+  );
+
+  const data = (await res.json()) as EmbeddingResponse;
+  if (!res.ok || !data.embedding?.values) {
+    throw new Error(data.error?.message || "Gemini embedding request failed");
+  }
+
+  return data.embedding.values;
 }
 
 function cosine(a: number[], b: number[]) {
-  const dot = a.reduce((sum, v, i) => sum + v * b[i], 0);
-  const normA = Math.sqrt(a.reduce((s, v) => s + v * v, 0));
-  const normB = Math.sqrt(b.reduce((s, v) => s + v * v, 0));
-  return dot / (normA * normB);
+  const dot = a.reduce((sum, value, index) => sum + value * b[index], 0);
+  const normA = Math.sqrt(a.reduce((sum, value) => sum + value * value, 0));
+  const normB = Math.sqrt(b.reduce((sum, value) => sum + value * value, 0));
+  return normA && normB ? dot / (normA * normB) : 0;
 }
 
 export async function searchRelevant(query: string) {
-  const qVec = await embed(query);
+  const queryEmbedding = await embed(query, "RETRIEVAL_QUERY");
+  const scored = await Promise.all(
+    docs.map(async (doc) => ({
+      doc,
+      score: cosine(await embed(doc, "RETRIEVAL_DOCUMENT"), queryEmbedding)
+    }))
+  );
 
-  const scored = [];
-
-  for (let doc of docs) {
-    const dVec = await embed(doc);
-    const score = cosine(qVec, dVec);
-    scored.push({ doc, score });
-  }
-
-  scored.sort((a, b) => b.score - a.score);
-
-  return scored.slice(0, 3).map(s => s.doc);
+  return scored
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 3)
+    .map((item) => item.doc);
 }

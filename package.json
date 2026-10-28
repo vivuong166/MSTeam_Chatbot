@@ -1,12 +1,17 @@
 {
   "name": "chatbot-gr1",
   "version": "1.0.0",
-  "main": "dist/index.js",
+  "main": "dist/src/index.js",
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
     "bot": "ts-node-dev --respawn --transpile-only scripts/teamsBot.ts",
     "build": "tsc",
-    "start": "node dist/index.js"
+    "start": "node dist/src/index.js",
+    "db:migrate:bot-control": "ts-node scripts/migrateBotControl.ts",
+    "test:toolhub": "npm run build && node --test dist/src/services/toolhubClient.test.js",
+    "test:agent": "npm run build && node --test dist/src/agent/intentRouter.test.js dist/src/agent/chatService.test.js",
+    "test": "npm run build && node --test dist/src/services/toolhubClient.test.js dist/src/agent/intentRouter.test.js dist/src/agent/chatService.test.js dist/src/control/botControlService.test.js",
+    "toolhub:search": "ts-node scripts/toolhubSearch.ts"
   },
   "dependencies": {
     "axios": "^1.16.1",

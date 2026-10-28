@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Điều khiển Teams Bot</title>
+    <link rel="stylesheet" href="control.css">
+  </head>
+  <body>
+    <main class="panel">
+      <h1>Teams Bot</h1>
+      <p id="status" class="status">Đang tải trạng thái...</p>
+      <p id="description" class="description"></p>
+      <div class="actions">
+        <button id="pause-button" type="button">Dừng bot trả lời</button>
+        <button id="resume-button" type="button">Bật bot trả lời</button>
+      </div>
+      <p id="notice" class="notice" aria-live="polite"></p>
+      <p class="hint">
+        Khi bot dừng, tin nhắn đến và phản hồi do người thật gửi trong cuộc chat đang mở
+        vẫn được lưu vào lịch sử. Bot không gọi Gemini và không gửi trả lời tự động.
+      </p>
+    </main>
+    <script src="control.js"></script>
+  </body>
+</html>
